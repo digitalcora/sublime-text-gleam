@@ -1,0 +1,195 @@
+%YAML 1.2
+---
+file_extensions:
+  - gleam
+scope: source.gleam
+version: 2
+
+variables:
+  lower_ident: '[[:lower:]][[:word:]]*'
+  upper_ident: '[[:upper:]][[:word:]]*'
+
+contexts:
+  main:
+    - include: bitstring
+    - include: block
+    - include: comment
+    - include: constant_def
+    - include: field_name
+    - include: function_call
+    - include: function_def
+    - include: import
+    - include: keyword
+    - include: number
+    - include: operator
+    - include: prelude_type
+    - include: punctuation
+    - include: string
+    - include: unused_name
+    - include: type_name
+
+  # Bitstrings
+  bitstring:
+    - match: '<<'
+      scope: punctuation.definition.generic.begin.gleam
+      push:
+        - match: '\b(binary|bytes|int|float|bit_string|bits|utf8|utf16|utf32|utf8_codepoint|utf16_codepoint|utf32_codepoint|signed|unsigned|big|little|native|unit|size)\b'
+          scope: keyword.other.gleam
+        - include: number
+        - include: string
+        - match: '>>'
+          scope: punctuation.definition.generic.end.gleam
+          pop: true
+
+  # Blocks
+  block:
+    - match: '{'
+      scope: punctuation.section.block.begin.gleam
+    - match: '}'
+      scope: punctuation.section.block.end.gleam
+
+  # Comments
+  comment:
+    - match: '///?/?'
+      scope: punctuation.definition.comment.line.gleam
+      push:
+        - meta_scope: comment.line.gleam
+        - match: $
+          pop: true
+
+  # Constant definitions
+  constant_def:
+    - match: '\b(const)\s+({{lower_ident}})\b'
+      captures:
+        1: keyword.other.gleam
+        2: entity.name.constant.gleam
+
+  # Field names
+  field_name:
+    - match: '\b{{lower_ident}}:'
+      scope: constant.other.gleam
+
+  # Function calls
+  function_call:
+    - match: '\b(?:{{lower_ident}}\.)*({{lower_ident}})\('
+      captures:
+        1: variable.function.gleam
+
+  # Function definitions
+  function_def:
+    - match: '\b(fn)(?:[[:space:]]+({{lower_ident}}))?[[:space:]]*\('
+      captures:
+        1: storage.type.function.gleam
+        2: entity.name.function.gleam
+      push: function_def_args
+    - match: '->'
+      scope: keyword.declaration.function.gleam
+
+  # Function arguments
+  function_def_args:
+    - include: function_def
+    - include: prelude_type
+    - include: punctuation
+    - include: type_name
+    - match: '\b(?:({{lower_ident}})[[:space:]]+)?({{lower_ident}}:)'
+      captures:
+        1: variable.parameter.gleam
+        2: variable.parameter.gleam
+    - match: '\('
+      push: function_def_args
+    - match: '\)'
+      pop: true
+
+  # Imports
+  import:
+    - match: '^import\b'
+      scope: keyword.control.import.gleam
+      push:
+        - include: import_keyword
+        - match: '\b(?:{{lower_ident}}/)*{{lower_ident}}\b'
+          scope: entity.name.namespace.gleam
+        - match: '(\.)({)'
+          captures:
+            1: punctuation.accessor.gleam
+            2: punctuation.definition.generic.begin.gleam
+          push:
+            - include: import_keyword
+            - include: punctuation
+            - include: type_name
+            - match: '}'
+              scope: punctuation.definition.generic.end.gleam
+              pop: true
+        - match: $
+          pop: true
+
+  # Keywords only used within imports
+  import_keyword:
+    - match: '\bas\b'
+      scope: keyword.control.import.gleam
+
+  # Keywords
+  keyword:
+    - match: '\b(assert|case|const|let|todo|try|tuple|use)\b'
+      scope: keyword.control.gleam
+    - match: '\bif\b'
+      scope: keyword.control.conditional.gleam
+    - match: '\b(external|opaque|pub)\b'
+      scope: storage.modifier
+    - match: '\btype\b'
+      scope: storage.type
+
+  # Numbers
+  number:
+    - match: '\b0b[01]+\b'
+      scope: constant.numeric.binary.gleam
+    - match: '\b0b[0-7]+\b'
+      scope: constant.numeric.octal.gleam
+    - match: '\b[[:digit:]][[:digit:]_]*(\.[[:digit:]]*)?\b'
+      scope: constant.numeric.decimal.gleam
+    - match: '\b0x[[:xdigit:]]+\b'
+      scope: constant.numeric.hexadecimal.gleam
+
+  # Operators
+  operator:
+    - match: '(\|>|\.\.|<=\.|>=\.|==\.|!=\.|<\.|>\.|<=|>=|==|!=|<|>|<>|\|)'
+      scope: keyword.operator.gleam
+    - match: '(\+\.|\-\.|/\.|\*\.|%\.|\+|\-|/|\*|%)'
+      scope: keyword.operator.arithmetic.gleam
+    - match: '(=|<-)'
+      scope: keyword.operator.assignment.gleam
+    - match: '(&&|\|\|)'
+      scope: keyword.operator.logical.gleam
+
+  # Selected prelude types
+  prelude_type:
+    - match: '\b(False|Nil|True)\b'
+      scope: support.type.gleam
+
+  # Punctuation (separators, accessors)
+  punctuation:
+    - match: '\.'
+      scope: punctuation.accessor.gleam
+    - match: ','
+      scope: punctuation.separator.gleam
+
+  # Strings
+  string:
+    - match: '"'
+      scope: punctuation.definition.string.begin.gleam
+      push:
+        - meta_scope: string.quoted.double.gleam
+        - match: '\\.'
+          scope: constant.character.escape.gleam
+        - match: '"'
+          scope: punctuation.definition.string.end.gleam
+          pop: true
+
+  # Types and constructors
+  type_name:
+    - match: '\b(?:{{lower_ident}}\.)*{{upper_ident}}\b'
+      scope: entity.name.type.gleam
+
+  # Unused bindings
+  unused_name:
+    - match: '\b_{{lower_ident}}\b'
+      scope: comment.line.gleam

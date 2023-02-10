@@ -1,0 +1,6 @@
+Since the original Gleam package was no longer maintained, this version is
+actually a new package with a new maintainer. It no longer provides formatting;
+to replicate the format-on-save behavior of the old package, you can use the
+`Fmt` package (https://packagecontrol.io/packages/Fmt). See here for details:
+
+https://github.com/digitalcora/sublime-text-gleam/blob/main/README.md#formatting
