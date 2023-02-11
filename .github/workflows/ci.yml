@@ -1,0 +1,32 @@
+---
+name: CI
+
+on:
+  push:
+    paths-ignore:
+      - '*.md'
+      - LICENSE
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  format:
+    name: YAML Format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/setup
+      - run: poetry run yamlfix --check . syntaxes/*.sublime-syntax
+  review:
+    name: Package Review
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/setup
+      - run: poetry run st_package_reviewer .
