@@ -1,0 +1,8 @@
+.git* export-ignore
+.github/** export-ignore
+.tool-versions export-ignore
+*.lock export-ignore
+*.toml export-ignore
+examples export-ignore
+examples/** export-ignore
+README.md export-ignore
