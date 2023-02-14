@@ -2,7 +2,7 @@
 .github/** export-ignore
 .tool-versions export-ignore
 *.lock export-ignore
+*.md export-ignore
 *.toml export-ignore
 examples export-ignore
 examples/** export-ignore
-README.md export-ignore

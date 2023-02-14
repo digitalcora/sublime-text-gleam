@@ -45,31 +45,3 @@ same environment Sublime Text is running on. Other examples:
   `["~/.asdf/shims/gleam", "format", "--stdin"]`
 * with Sublime Text on Windows and Gleam on WSL:
   `["wsl", "gleam", "format", "--stdin"]`
-
-
-## Contributing
-
-Contributions are welcome! For non-trivial changes, please open an issue first
-to discuss.
-
-Note that to keep the project easy to maintain, I'm unlikely to approve of new
-features if the same functionality can already be achieved with existing Gleam
-and Sublime Text tools. For a good example of this, see **Formatting** above.
-
-Interactions on this repo should abide by the [Gleam Code of Conduct][coc]. To
-contact me privately about a conduct issue, use the address on [my website].
-
-[coc]: https://github.com/gleam-lang/gleam/blob/main/CODE_OF_CONDUCT.md
-[my website]: https://digitalcora.net/
-
-### Development
-
-When working on this (or any) package, you can symlink the repo directory into
-your local Sublime Text "Packages" directory (Preferences → Browse Packages).
-Files here will override the corresponding files in the published package from
-Package Control, so you don't have to remove it. Sublime will also auto-reload
-these files when they change.
-
-See also the Sublime Text [Package Development][stdocs] documentation.
-
-[stdocs]: https://www.sublimetext.com/docs/#package-development
