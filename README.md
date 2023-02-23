@@ -2,6 +2,9 @@
 
 ✨ [Gleam](https://gleam.run) syntax support for Sublime Text.
 
+Provides syntax highlighting and "toggle comment" support
+(<kbd>Ctrl/Cmd</kbd>+<kbd>/</kbd>).
+
 
 ## Installation
 
@@ -11,8 +14,6 @@ This package is available on
 1. Open the command palette (<kbd>Ctrl/Cmd</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>)
 2. Select **Package Control: Install Package**
 3. Select **Gleam**
-
-Files with the `.gleam` extension should now be syntax-highlighted.
 
 
 ## Formatting

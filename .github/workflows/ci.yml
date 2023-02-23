@@ -23,11 +23,11 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: ./.github/actions/setup
-      - run: poetry run yamlfix --check . syntaxes/*.sublime-syntax
+      - run: bin/yamlfix --check
   review:
     name: Package Review
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: ./.github/actions/setup
-      - run: poetry run st_package_reviewer .
+      - run: bin/review
