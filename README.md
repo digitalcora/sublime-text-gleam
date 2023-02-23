@@ -46,3 +46,19 @@ same environment Sublime Text is running on. Other examples:
   `["~/.asdf/shims/gleam", "format", "--stdin"]`
 * with Sublime Text on Windows and Gleam on WSL:
   `["wsl", "gleam", "format", "--stdin"]`
+
+
+## Compatibility
+
+This package is developed for Sublime Text 4+, and is not available in Package
+Control on older versions. It can be installed manually in Sublime Text 3, but
+this is unsupported, and bugs that only appear in ST3 will not be fixed.
+
+### Manual Installation
+
+1. Download the `.zip` for the desired version from the GitHub **Releases** page
+2. Rename this file (without unzipping it) to `Gleam.sublime-package`
+3. Place the file in your Sublime Text "Installed Packages" directory
+
+"Installed Packages" can be found using Preferences → Browse Packages within
+Sublime Text (go up one level from the directory this opens).
