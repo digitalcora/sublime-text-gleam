@@ -126,7 +126,9 @@ contexts:
 
   # Keywords
   keyword:
-    - match: \b(as|assert|case|const|let|todo|try|tuple|use)\b
+    - match: \btodo\b
+      scope: invalid.illegal.gleam
+    - match: \b(as|assert|case|const|let|try|use)\b
       scope: keyword.other.gleam
     - match: \bif\b
       scope: keyword.control.conditional.gleam
