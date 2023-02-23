@@ -18,10 +18,10 @@ contexts:
     - include: comment
     - include: constant_def
     - include: field_name
-    - include: function_call
     - include: function_def
-    - include: import
     - include: keyword
+    - include: function_call
+    - include: import
     - include: number
     - include: operator
     - include: prelude_type
@@ -107,7 +107,8 @@ contexts:
     - match: ^import\b
       scope: keyword.control.import.gleam
       push:
-        - include: import_keyword
+        - match: \bas\b
+          scope: keyword.control.import.gleam
         - match: \b(?:{{lower_ident}}/)*{{lower_ident}}\b
           scope: entity.name.namespace.gleam
         - match: (\.)({)
@@ -115,7 +116,6 @@ contexts:
             1: punctuation.accessor.gleam
             2: punctuation.definition.generic.begin.gleam
           push:
-            - include: import_keyword
             - include: punctuation
             - include: type_name
             - match: '}'
@@ -124,21 +124,18 @@ contexts:
         - match: $
           pop: true
 
-  # Keywords only used within imports
-  import_keyword:
-    - match: \bas\b
-      scope: keyword.control.import.gleam
-
   # Keywords
   keyword:
-    - match: \b(assert|case|const|let|todo|try|tuple|use)\b
-      scope: keyword.control.gleam
+    - match: \b(as|assert|case|const|let|todo|try|tuple|use)\b
+      scope: keyword.other.gleam
     - match: \bif\b
       scope: keyword.control.conditional.gleam
     - match: \b(external|opaque|pub)\b
-      scope: storage.modifier
+      scope: storage.modifier.gleam
     - match: \btype\b
-      scope: storage.type
+      scope: storage.type.gleam
+    - match: \bfn\b
+      scope: storage.type.function.gleam
 
   # Numbers
   number:
