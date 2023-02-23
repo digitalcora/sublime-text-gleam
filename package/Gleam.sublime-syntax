@@ -24,7 +24,6 @@ contexts:
     - include: import
     - include: number
     - include: operator
-    - include: prelude_type
     - include: punctuation
     - include: string
     - include: unused_name
@@ -90,7 +89,6 @@ contexts:
   # Function arguments
   function_def_args:
     - include: function_def
-    - include: prelude_type
     - include: punctuation
     - include: type_name
     - match: \b(?:({{lower_ident}})[[:space:]]+)?({{lower_ident}}:)
@@ -160,11 +158,6 @@ contexts:
       scope: keyword.operator.assignment.gleam
     - match: (&&|\|\|)
       scope: keyword.operator.logical.gleam
-
-  # Selected prelude types
-  prelude_type:
-    - match: \b(False|Nil|True)\b
-      scope: support.type.gleam
 
   # Punctuation (separators, accessors)
   punctuation:
