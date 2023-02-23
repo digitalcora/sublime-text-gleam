@@ -5,6 +5,7 @@ on:
   push:
     paths-ignore:
       - examples/**
+      - images/**
       - '*.md'
       - LICENSE
 

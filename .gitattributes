@@ -6,3 +6,5 @@
 *.toml export-ignore
 examples export-ignore
 examples/** export-ignore
+images export-ignore
+images/** export-ignore

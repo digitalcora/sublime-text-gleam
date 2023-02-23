@@ -2,8 +2,10 @@
 
 ✨ [Gleam](https://gleam.run) syntax support for Sublime Text.
 
-Provides syntax highlighting and "toggle comment" support
-(<kbd>Ctrl/Cmd</kbd>+<kbd>/</kbd>).
+<p>
+  <img alt="light screenshot" title="Breakers" src="images/screen-light.png" width="45%">
+  <img alt="dark screenshot" title="Mariana" src="images/screen-dark.png" width="45%">
+</p>
 
 
 ## Installation
