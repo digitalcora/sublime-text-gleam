@@ -91,6 +91,7 @@ contexts:
     - include: function_def
     - include: punctuation
     - include: type_name
+    - include: unused_name
     - match: \b(?:({{lower_ident}})[[:space:]]+)?({{lower_ident}}:)
       captures:
         1: variable.parameter.gleam
