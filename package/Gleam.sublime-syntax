@@ -122,7 +122,7 @@ contexts:
     - include: unused_name
     - match: \b(?:({{lower_ident}})[[:space:]]+)?({{lower_ident}}:)
       captures:
-        1: variable.parameter.gleam
+        1: constant.other.gleam
         2: variable.parameter.gleam
     - match: \(
       push: function_def_args
