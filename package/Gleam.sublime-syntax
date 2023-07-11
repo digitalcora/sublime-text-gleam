@@ -17,10 +17,10 @@ contexts:
     - include: block
     - include: comment
     - include: constant_def
-    - include: field_name
     - include: function_def
     - include: keyword
     - include: function_call
+    - include: record
     - include: import
     - include: number
     - include: operator
@@ -28,6 +28,24 @@ contexts:
     - include: string
     - include: unused_name
     - include: type_name
+
+  # Arguments to a function call or record constructor
+  arguments:
+    - include: bitstring
+    - include: block
+    - include: comment
+    - include: function_call
+    - include: record
+    - include: number
+    - include: operator
+    - include: punctuation
+    - include: string
+    - include: unused_name
+    - include: type_name
+    - match: '\b{{lower_ident}}:'
+      scope: constant.other.gleam
+    - match: \)
+      pop: true
 
   # Bitstrings
   bitstring:
@@ -65,16 +83,12 @@ contexts:
         1: keyword.other.gleam
         2: entity.name.constant.gleam
 
-  # Field names
-  field_name:
-    - match: '\b{{lower_ident}}:'
-      scope: constant.other.gleam
-
   # Function calls
   function_call:
     - match: \b(?:{{lower_ident}}\.)*({{lower_ident}})\(
       captures:
         1: variable.function.gleam
+      push: arguments
 
   # Function definitions
   function_def:
@@ -166,6 +180,13 @@ contexts:
       scope: punctuation.accessor.gleam
     - match: ','
       scope: punctuation.separator.gleam
+
+  # Records (constructors with arguments)
+  record:
+    - match: \b((?:{{lower_ident}}\.)*{{upper_ident}})\(
+      captures:
+        1: entity.name.type.gleam
+      push: arguments
 
   # Strings
   string:
