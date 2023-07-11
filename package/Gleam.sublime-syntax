@@ -131,6 +131,8 @@ contexts:
           push:
             - include: punctuation
             - include: type_name
+            - match: \bas\b
+              scope: keyword.other.gleam
             - match: '}'
               scope: punctuation.definition.generic.end.gleam
               pop: true
