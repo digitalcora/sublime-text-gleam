@@ -13,6 +13,7 @@ variables:
 
 contexts:
   main:
+    - include: attribute
     - include: bitstring
     - include: block
     - include: comment
@@ -29,7 +30,20 @@ contexts:
     - include: unused_name
     - include: type_name
 
-  # Arguments to a function call or record constructor
+  # Attributes (annotations)
+  attribute:
+    - match: ^\s*(@{{lower_ident}})\(
+      captures:
+        1: variable.other.constant.gleam
+      push:
+        - include: arguments
+        - meta_scope: meta.annotation.gleam
+    - match: ^\s*(@{{lower_ident}})
+      scope: meta.annotation.gleam
+      captures:
+        1: variable.other.constant.gleam
+
+  # Arguments (to a function call, record constructor, or attribute)
   arguments:
     - include: bitstring
     - include: block
