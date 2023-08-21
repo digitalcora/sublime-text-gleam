@@ -48,6 +48,7 @@ contexts:
     - include: bitstring
     - include: block
     - include: comment
+    - include: function_def
     - include: function_call
     - include: record
     - include: number
