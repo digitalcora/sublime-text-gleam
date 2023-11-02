@@ -146,7 +146,7 @@ contexts:
           push:
             - include: punctuation
             - include: type_name
-            - match: \bas\b
+            - match: \b(as|type)\b
               scope: keyword.other.gleam
             - match: '}'
               scope: punctuation.definition.generic.end.gleam
