@@ -69,7 +69,7 @@ contexts:
       push:
         - include: number
         - include: string
-        - match: \b(binary|bytes|int|float|bit_string|bits|utf8|utf16|utf32|utf8_codepoint|utf16_codepoint|utf32_codepoint|signed|unsigned|big|little|native|unit|size)\b
+        - match: \b(bytes|int|float|bits|utf8|utf16|utf32|utf8_codepoint|utf16_codepoint|utf32_codepoint|signed|unsigned|big|little|native|unit|size)\b
           scope: keyword.other.gleam
         - match: '>>'
           scope: punctuation.definition.generic.end.gleam
@@ -156,13 +156,9 @@ contexts:
 
   # Keywords
   keyword:
-    - match: \btodo\b
-      scope: invalid.illegal.gleam
-    - match: \b(as|assert|case|const|let|panic|try|use)\b
+    - match: \b(as|assert|case|const|let|panic|todo|use)\b
       scope: keyword.other.gleam
-    - match: \bif\b
-      scope: keyword.control.conditional.gleam
-    - match: \b(external|opaque|pub)\b
+    - match: \b(opaque|pub)\b
       scope: storage.modifier.gleam
     - match: \btype\b
       scope: storage.type.gleam
