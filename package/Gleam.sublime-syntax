@@ -210,8 +210,12 @@ contexts:
       scope: punctuation.definition.string.begin.gleam
       push:
         - meta_scope: string.quoted.double.gleam
-        - match: \\.
+        - match: \\[nrt"\\]
           scope: constant.character.escape.gleam
+        - match: \\u\{[[:xdigit:]]{1,6}\}
+          scope: constant.character.escape.gleam
+        - match: \\
+          scope: invalid.illegal.gleam
         - match: '"'
           scope: punctuation.definition.string.end.gleam
           pop: true
