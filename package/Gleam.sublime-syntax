@@ -164,6 +164,9 @@ contexts:
       scope: storage.type.gleam
     - match: \bfn\b
       scope: storage.type.function.gleam
+    # Reserved for future use
+    - match: \b(auto|delegate|derive|else|implement|macro|test)\b
+      scope: invalid.illegal.gleam
 
   # Numbers
   number:
