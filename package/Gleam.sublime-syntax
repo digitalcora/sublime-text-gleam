@@ -165,7 +165,7 @@ contexts:
     - match: \bfn\b
       scope: storage.type.function.gleam
     # Reserved for future use
-    - match: \b(auto|delegate|derive|else|implement|macro|test)\b
+    - match: \b(auto|delegate|derive|echo|else|implement|macro|test)\b
       scope: invalid.illegal.gleam
 
   # Numbers
