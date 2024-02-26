@@ -6,7 +6,7 @@
 *.toml export-ignore
 bin export-ignore
 bin/** export-ignore
-examples export-ignore
-examples/** export-ignore
 images export-ignore
 images/** export-ignore
+tests export-ignore
+tests/** export-ignore

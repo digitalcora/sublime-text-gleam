@@ -4,7 +4,6 @@ name: CI
 on:
   push:
     paths-ignore:
-      - examples/**
       - images/**
       - '*.md'
       - LICENSE
@@ -17,7 +16,17 @@ defaults:
   run:
     shell: bash
 
+env:
+  SUBLIME_BUILD: 4169
+
 jobs:
+  check:
+    name: Gleam Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - run: cd tests && gleam check
   format:
     name: YAML Format
     runs-on: ubuntu-latest
@@ -32,3 +41,25 @@ jobs:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
       - run: bin/review
+  syntax:
+    # Reference:
+    # https://github.com/sublimehq/Packages/blob/master/.github/workflows/ci.yml
+    name: Syntax Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/cache@v3
+        id: st-cache
+        with:
+          path: ~/.sublime
+          key: st-${{ env.SUBLIME_BUILD }}
+      - if: '!steps.st-cache.outputs.cache-hit'
+        run: >
+          mkdir -p ~/.sublime
+          && curl -L https://download.sublimetext.com/st_syntax_tests_build_${{ env.SUBLIME_BUILD }}_x64.tar.xz
+          | tar Jvx -C ~/.sublime --strip-components 1
+      - run: |-
+          mkdir ~/.sublime/Data/Packages/Gleam
+          mv package tests ~/.sublime/Data/Packages/Gleam/
+          ~/.sublime/syntax_tests
+          rm -r ~/.sublime/Data/Packages/Gleam
