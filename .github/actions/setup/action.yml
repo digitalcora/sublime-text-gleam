@@ -5,7 +5,7 @@ description: Installs tools and dependencies
 runs:
   using: composite
   steps:
-    - uses: actions/cache@v3
+    - uses: actions/cache@v4
       id: asdf-cache
       with:
         path: ~/.asdf
@@ -13,7 +13,7 @@ runs:
     - uses: asdf-vm/actions/install@v3
       if: '!steps.asdf-cache.outputs.cache-hit'
     - uses: mbta/actions/reshim-asdf@v2
-    - uses: actions/cache@v3
+    - uses: actions/cache@v4
       id: venv-cache
       with:
         path: ~/.cache/pypoetry
