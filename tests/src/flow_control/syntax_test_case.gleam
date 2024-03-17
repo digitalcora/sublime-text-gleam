@@ -89,7 +89,7 @@ fn get_first_non_empty(lists: List(List(t))) -> List(t) {
 fn get_first_larger(lists: List(Int), limit: Int) -> Int {
   case lists {
     [first, ..] if first > limit -> first
-    //          ^^ source - TODO: fix, should be keyword
+    //          ^^ keyword.other
     //                   ^ keyword.operator
     [_, ..rest] -> get_first_larger(rest, limit)
     [] -> 0

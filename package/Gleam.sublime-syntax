@@ -158,7 +158,7 @@ contexts:
 
   # Keywords
   keyword:
-    - match: \b(as|assert|case|const|let|panic|todo|use)\b
+    - match: \b(as|assert|case|const|if|let|panic|todo|use)\b
       scope: keyword.other.gleam
     - match: \b(opaque|pub)\b
       scope: storage.modifier.gleam
