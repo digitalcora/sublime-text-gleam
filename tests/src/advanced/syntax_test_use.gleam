@@ -6,7 +6,7 @@ import gleam/result
 pub fn main() {
   use username <- result.try(get_username())
 //^^^ keyword.other
-//             ^^ keyword.operator - TODO: fix `-` being `arithmetic`
+//             ^^ keyword.operator.assignment
 //                       ^^^ variable.function
 //                           ^^^^^^^^^^^^ variable.function
   use password <- result.try(get_password())
@@ -15,7 +15,7 @@ pub fn main() {
 
   use <- debug_it()
 //^^^ keyword.other
-//    ^^ keyword.operator
+//    ^^ keyword.operator.assignment
 //       ^^^^^^^^ variable.function
   "Hello, Joe!"
 }
