@@ -15,7 +15,7 @@ pub fn main() {
   io.debug(0b00001111)
   //       ^^^^^^^^^^ constant.numeric.binary
   io.debug(0o17)
-  // TODO: octal literals
+  //       ^^^^ constant.numeric.octal
   io.debug(0xF)
   //       ^^^ constant.numeric.hexadecimal
 

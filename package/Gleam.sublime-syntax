@@ -174,7 +174,7 @@ contexts:
   number:
     - match: \b0b[01]+\b
       scope: constant.numeric.binary.gleam
-    - match: \b0b[0-7]+\b
+    - match: \b0o[0-7]+\b
       scope: constant.numeric.octal.gleam
     - match: \b[[:digit:]][[:digit:]_]*(\.[[:digit:]]*)?\b
       scope: constant.numeric.decimal.gleam
