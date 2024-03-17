@@ -146,8 +146,10 @@ contexts:
           push:
             - include: punctuation
             - include: type_name
-            - match: \b(as|type)\b
-              scope: keyword.other.gleam
+            - match: \bas\b
+              scope: keyword.control.import.gleam
+            - match: \btype\b
+              scope: storage.type.gleam
             - match: '}'
               scope: punctuation.definition.generic.end.gleam
               pop: true

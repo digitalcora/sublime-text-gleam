@@ -46,14 +46,14 @@ import gleam/io.{println as bar}
 //             ^ punctuation.accessor
 //              ^ punctuation.definition.generic.begin
 //               ^^^^^^^ source - TODO: function/type name?
-//                       ^^ keyword.other - TODO: fix, should be import
+//                       ^^ keyword.control.import
 //                          ^^^ source - TODO: function/type name?
 //                             ^ punctuation.definition.generic.end
 
 // == Imported types, multiple imports
 
 import gleam/option.{type Option, Some, None}
-//                   ^^^^ keyword.other
+//                   ^^^^ storage.type
 //                        ^^^^^^ entity.name.type
 //                              ^ punctuation.separator
 //                                ^^^^ entity.name.type
