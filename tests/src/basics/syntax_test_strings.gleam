@@ -19,13 +19,14 @@ pub fn main() {
   io.debug("One " <> "Two")
   //              ^^ keyword.operator
 
-  // Escape sequences (TODO: \f)
-  io.debug("\" \\ \n \r \t")
+  // Escape sequences
+  io.debug("\" \\ \f \n \r \t")
   //        ^^ constant.character.escape
   //           ^^ constant.character.escape
   //              ^^ constant.character.escape
   //                 ^^ constant.character.escape
   //                    ^^ constant.character.escape
+  //                       ^^ constant.character.escape
 
   // Unicode escape sequences
   io.debug("\u{1b} \u{000a} \u{01F600}")

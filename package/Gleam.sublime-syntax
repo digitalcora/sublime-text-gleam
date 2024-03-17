@@ -216,7 +216,7 @@ contexts:
       scope: punctuation.definition.string.begin.gleam
       push:
         - meta_scope: string.quoted.double.gleam
-        - match: \\[nrt"\\]
+        - match: \\[fnrt"\\]
           scope: constant.character.escape.gleam
         - match: \\u\{[[:xdigit:]]{1,6}\}
           scope: constant.character.escape.gleam
