@@ -29,3 +29,7 @@ these files when they change.
 See also the Sublime Text [Package Development][stdocs] documentation.
 
 [stdocs]: https://www.sublimetext.com/docs/#package-development
+
+### Testing
+
+See [`tests/README.md`](tests/README.md).
