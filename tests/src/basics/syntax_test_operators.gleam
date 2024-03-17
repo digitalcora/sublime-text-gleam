@@ -54,7 +54,7 @@ pub fn main() {
   io.debug(True && True)
   //            ^^ keyword.operator.logical
   io.debug(False || False)
-  //             ^^ keyword.operator - TODO: fix, should be logical
+  //             ^^ keyword.operator.logical
   io.debug(False || True)
-  //             ^^ keyword.operator - TODO: fix, should be logical
+  //             ^^ keyword.operator.logical
 }

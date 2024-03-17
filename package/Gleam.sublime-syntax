@@ -185,7 +185,7 @@ contexts:
   operator:
     - match: <-
       scope: keyword.operator.assignment.gleam
-    - match: (\|>|\.\.|<=\.|>=\.|==\.|!=\.|<\.|>\.|<=|>=|==|!=|<|>|<>|\|)
+    - match: (\|>|\.\.|<=\.|>=\.|==\.|!=\.|<\.|>\.|<=|>=|==|!=|<|>|<>)
       scope: keyword.operator.gleam
     - match: '='
       scope: keyword.operator.assignment.gleam
@@ -193,6 +193,8 @@ contexts:
       scope: keyword.operator.arithmetic.gleam
     - match: (&&|\|\|)
       scope: keyword.operator.logical.gleam
+    - match: \|
+      scope: keyword.operator.gleam
 
   # Punctuation (separators, accessors)
   punctuation:
