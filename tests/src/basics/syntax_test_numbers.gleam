@@ -19,9 +19,10 @@ pub fn main() {
   io.debug(0xF)
   //       ^^^ constant.numeric.hexadecimal
 
-  // TODO: Scientific notation Float literals
   io.debug(7.0e7)
+  //       ^^^^^ constant.numeric.decimal
   io.debug(3.0e-4)
+  //       ^^^^^^ constant.numeric.decimal
 
   // Unary negation
   io.debug(-1)
