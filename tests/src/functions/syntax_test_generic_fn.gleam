@@ -10,6 +10,6 @@ pub fn main() {
 fn twice(argument: value, function: fn(value) -> value) -> value {
 //                 ^^^^^ source - TODO: scope for this?
 //                                  ^^ storage.type.function
-//                                            ^^ keyword.declaration.function
+//                                            ^^ keyword.operator
   function(function(argument))
 }

@@ -10,7 +10,7 @@ pub fn main() {
     //                            ^ punctuation.section.block.begin
     0 -> "Zero"
 //  ^ constant.numeric
-//    ^^ keyword.declaration.function - TODO: fix, should be operator?
+//    ^^ keyword.operator
 //       ^^^^^^ string.quoted
     1 -> "One"
     _ -> "Other"

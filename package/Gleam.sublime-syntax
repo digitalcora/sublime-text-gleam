@@ -112,8 +112,6 @@ contexts:
         1: storage.type.function.gleam
         2: entity.name.function.gleam
       push: function_def_args
-    - match: ->
-      scope: keyword.declaration.function.gleam
 
   # Function arguments
   function_def_args:
@@ -121,6 +119,8 @@ contexts:
     - include: punctuation
     - include: type_name
     - include: unused_name
+    - match: ->
+      scope: keyword.operator.gleam
     - match: \b(?:({{lower_ident}})[[:space:]]+)?({{lower_ident}}:)
       captures:
         1: constant.other.gleam
@@ -189,6 +189,8 @@ contexts:
       scope: keyword.operator.gleam
     - match: '='
       scope: keyword.operator.assignment.gleam
+    - match: ->
+      scope: keyword.operator.gleam
     - match: (\+\.|\-\.|/\.|\*\.|%\.|\+|\-|/|\*|%)
       scope: keyword.operator.arithmetic.gleam
     - match: (&&|\|\|)

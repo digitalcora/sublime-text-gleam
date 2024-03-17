@@ -1,5 +1,7 @@
 // SYNTAX TEST "Packages/Gleam/package/Gleam.sublime-syntax"
 
+// TODO: better scope for type-annotating `->`
+
 import gleam/io
 
 pub fn main() {
@@ -50,7 +52,7 @@ fn multiply(a: Int, b: Int) -> Int {
 //                ^ punctuation.separator
 //                  ^^ variable.parameter
 //                     ^^^ entity.name.type
-//                          ^^ keyword.declaration.function
+//                          ^^ keyword.operator
 //                             ^^^ entity.name.type
   a * b
 }
@@ -58,9 +60,9 @@ fn multiply(a: Int, b: Int) -> Int {
 fn twice(argument: Int, function: fn(Int) -> Int) -> Int {
 //                                ^^ storage.type.function
 //                                   ^^^ entity.name.type
-//                                        ^^ keyword.declaration.function
+//                                        ^^ keyword.operator
 //                                           ^^^ entity.name.type
-//                                                ^^ keyword.declaration.function
+//                                                ^^ keyword.operator
 //                                                   ^^^ entity.name.type
   function(function(argument))
   // <- variable.function

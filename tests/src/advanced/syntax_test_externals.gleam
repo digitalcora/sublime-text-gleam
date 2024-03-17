@@ -21,7 +21,7 @@ import gleam/io
 //^^^ storage.modifier
 //    ^^ storage.type.function
 //       ^^^ entity.name.function
-//             ^^ keyword.declaration.function
+//             ^^ keyword.operator
 //                ^^^^^^^^ entity.name.type
 
 pub fn main() {
