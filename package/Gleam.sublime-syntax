@@ -11,6 +11,7 @@ variables:
   discard: '_[_0-9a-z]*'
   name: '[a-z][_0-9a-z]*'
   upname: '[A-Z][0-9a-zA-Z]*'
+  not_module_keyword: '(?!const|external|fn|import|opaque|pub)'
 
 contexts:
   # Prepended to all scopes by default.
@@ -25,64 +26,34 @@ contexts:
         - match: (?=\S)
           pop: true
 
-  or-fail:
+  opt:
     - match: ''
-      pop: 1
+      pop: true
 
   req:
     - match: ''
-      pop: 1
-
-  opt:
-    - match: ''
-      pop: 2
-
-  done:
-    - match: ''
-      pop: 4
-
-  fail-base:
-    - match: ''
-      pop: 1
+      pop: true
     # - match: .
     #   scope: invalid.illegal.gleam
     #   push:
     #     - match: .*
     #       meta_include_prototype: false
 
-  fail:
-    - match: ''
-      pop: 3
-
-  repeat:
-    - match: ''
-      pop: 1
-
-  then:
-    - match: ''
-      pop: 3
-
   # The initial scope.
   main:
     - match: import\b
       scope: keyword.control.import.gleam
-      push:
-        - fail-base
-        - opt
-        - import-alias
-        - then
-        - opt
-        - unqualified-imports
-        - then
-        - req
-        - import-name
+      branch_point: import
+      branch:
+        - import--name
+        - import--aliased-name
 
   # ==== Comments
   #
   # According to the naming guide, "multi-line comments used as documentation"
   # should use `comment.block.documentation`. Unknown whether this has any real
   # effect in editors, or whether the scope should be applied to the entire doc
-  # comment "unbroken" by line breaks (which would be trickier).
+  # comment "unbroken" by line breaks (which we don't do here).
   #
   # Ref: https://www.sublimetext.com/docs/scope_naming.html#comment
 
@@ -96,207 +67,138 @@ contexts:
 
   # ==== Import statements
 
-  import-name:
-    - match: '{{name}}(?:/{{name}})*'
-      scope: entity.name.namespace.gleam
-      pop: 3
-    - include: or-fail
+  import--name:
+    - match: '{{not_module_keyword}}((?:{{name}}/)*)({{name}})'
+      captures:
+        1: entity.other.module-path.gleam
+        2: entity.name.namespace.gleam
+      set:
+        - import--no-alias
+        - import--unqualified
+    - include: req
 
-  unqualified-imports:
-    - match: (\.)
-      scope: punctuation.accessor.gleam
-      push:
-        - done
-        - fail
-        - req
-        - block-end
-        - then
-        - opt
-        - series-of-unqualified-import
-        - then
-        - req
-        - block-begin
-    - include: or-fail
+  import--aliased-name:
+    - match: '{{not_module_keyword}}((?:{{name}}/)*)({{name}})'
+      captures:
+        1: entity.other.module-path.gleam
+        2: entity.other.aliased.namespace.gleam
+      set:
+        - import--alias
+        - import--unqualified
+    - include: req
 
-  block-begin:
-    - match: '{'
-      scope: punctuation.definition.generic.begin.gleam
-      pop: 3
-    - include: or-fail
+  import--unqualified:
+    - match: (\.)({)
+      captures:
+        1: punctuation.accessor.gleam
+        2: punctuation.definition.generic.begin.gleam
+      set: import--unqualified--pre
+    - include: opt
+
+  import--no-alias:
+    - match: as
+      fail: import
+    - match: ''
+      pop: true
+
+  import--alias:
+    - match: as
+      scope: keyword.other.alias.gleam
+      set:
+        - match: '{{not_module_keyword}}{{name}}'
+          scope: entity.name.namespace.gleam
+          pop: true
+        - match: '{{discard}}'
+          scope: comment.other.discard.gleam
+          pop: true
+        - include: req
+    - include: req
+
+  import--unqualified--pre:
+    - include: block-end
+    - match: ''
+      set: import--unqualified--item
+
+  import--unqualified--item:
+    - match: 'type'
+      scope: storage.type.gleam
+      set: import--unqualified--item--type
+    - match: '(?=[A-Z])'
+      set: import--unqualified--item--variant
+    - match: '(?=[a-z])'
+      set: import--unqualified--item--constant
+    - include: import--unqualified--req
+
+  import--unqualified--item--type:
+    - match: '({{upname}})\s+(as)'
+      captures:
+        1: entity.other.aliased.type.gleam
+        2: keyword.other.alias.gleam
+      set: import--unqualified--item--type--alias
+    - match: '{{upname}}'
+      scope: entity.name.type.gleam
+      set: import--unqualified--post
+    - include: import--unqualified--req
+
+  import--unqualified--item--type--alias:
+    - match: '{{upname}}'
+      scope: entity.name.type.gleam
+      set: import--unqualified--post
+    - include: import--unqualified--req
+
+  import--unqualified--item--variant:
+    - match: '({{upname}})\s+(as)'
+      captures:
+        1: entity.other.aliased.function.constructor.gleam
+        2: keyword.other.alias.gleam
+      set: import--unqualified--item--variant--alias
+    - match: '{{upname}}'
+      scope: entity.name.function.constructor.gleam
+      set: import--unqualified--post
+    - include: import--unqualified--req
+
+  import--unqualified--item--variant--alias:
+    - match: '{{upname}}'
+      scope: entity.name.function.constructor.gleam
+      set: import--unqualified--post
+    - include: import--unqualified--req
+
+  import--unqualified--item--constant:
+    - match: '({{name}})\s+(as)'
+      captures:
+        1: entity.other.aliased.constant.gleam
+        2: keyword.other.alias.gleam
+      set: import--unqualified--item--constant--alias
+    - match: '{{name}}'
+      scope: entity.name.constant.gleam
+      set: import--unqualified--post
+    - include: import--unqualified--req
+
+  import--unqualified--item--constant--alias:
+    - match: '{{name}}'
+      scope: entity.name.constant.gleam
+      set: import--unqualified--post
+    - include: import--unqualified--req
+
+  import--unqualified--post:
+    - include: block-end
+    - match: ','
+      scope: punctuation.separator.gleam
+      set: import--unqualified--pre
+    - include: import--unqualified--req
+
+  import--unqualified--req:
+    - match: ''
+      set:
+      - match: (?=[,}])
+        set: import--unqualified--post
+
+  # === Common
 
   block-end:
     - match: '}'
       scope: punctuation.definition.generic.end.gleam
-      pop: 3
-    - include: or-fail
-
-  recover-at-block-end:
-    - match: '[^}]+'
-      pop: 2
-    - match: ''
-      pop: 3
-
-  separator:
-    - match: ','
-      scope: punctuation.separator.gleam
-      pop: 3
-    - include: or-fail
-
-  series-of-unqualified-import:
-    - match: ''
-      push:
-        - done
-        - fail
-        - opt
-        - separator
-        - then
-        - opt
-        - repeat-separator-and-unqualified-import
-        - then
-        - req
-        - unqualified-import
-
-  repeat-separator-and-unqualified-import:
-    - match: ''
-      push:
-        - repeat
-        - then
-        - req
-        - unqualified-import
-        - then
-        - req
-        - separator
-
-  unqualified-import:
-    - match: 'type'
-      scope: storage.type.gleam
-      branch_point: retry-unqualified-type-import
       pop: true
-      branch:
-        - unqualified-aliased-type-import
-        - type-name-definition
-    - match: '(?=[A-Z])'
-      branch_point: retry-unqualified-variant-import
-      pop: true
-      branch:
-        - unqualified-aliased-variant-import
-        - variant-name-definition
-    - match: '(?=[a-z])'
-      branch_point: retry-unqualified-func-import
-      pop: true
-      branch:
-        - unqualified-aliased-func-import
-        - func-name-definition
-    - include: or-fail
-
-  unqualified-aliased-type-import:
-    - match: ''
-      push:
-        - done
-        - then
-        - req
-        - type-name-definition
-        - then
-        - req-or-retry-unqualified-type-import
-        - keyword-as
-        - then
-        - req
-        - original-type-name
-
-  unqualified-aliased-variant-import:
-    - match: ''
-      push:
-        - done
-        - then
-        - req
-        - variant-name-definition
-        - then
-        - req-or-retry-unqualified-variant-import
-        - keyword-as
-        - then
-        - req
-        - original-variant-name
-
-  unqualified-aliased-func-import:
-    - match: ''
-      push:
-        - done
-        - then
-        - req
-        - func-name-definition
-        - then
-        - req-or-retry-unqualified-func-import
-        - keyword-as
-        - then
-        - req
-        - original-func-name
-
-  original-type-name:
-    - match: '{{upname}}'
-      scope: entity.other.aliased.type.gleam
-      pop: 3
-    - include: or-fail
-
-  original-variant-name:
-    - match: '{{upname}}'
-      scope: entity.other.aliased.function.constructor.gleam
-      pop: 3
-    - include: or-fail
-
-  original-func-name:
-    - match: '{{name}}'
-      scope: entity.other.aliased.function.gleam
-      pop: 3
-    - include: or-fail
-
-  keyword-as:
-    - match: 'as'
-      scope: keyword.other.alias.gleam
-      pop: 3
-    - include: or-fail
-
-  type-name-definition:
-    - match: '{{upname}}'
-      scope: entity.name.type.gleam
-      pop: 3
-    - include: or-fail
-
-  variant-name-definition:
-    - match: '{{upname}}'
-      scope: entity.name.function.constructor.gleam
-      pop: 3
-    - include: or-fail
-
-  func-name-definition:
-    - match: '{{name}}'
-      scope: entity.name.function.gleam
-      pop: 3
-    - include: or-fail
-
-  req-or-retry-unqualified-type-import:
-    - match: ''
-      fail: retry-unqualified-type-import
-
-  req-or-retry-unqualified-variant-import:
-    - match: ''
-      fail: retry-unqualified-variant-import
-
-  req-or-retry-unqualified-func-import:
-    - match: ''
-      fail: retry-unqualified-func-import
-
-  import-alias:
-    - match: as
-      scope: keyword.other.alias.gleam
-      set:
-        - match: '{{name}}'
-          scope: entity.name.namespace.gleam
-          pop: 3
-        - match: '{{discard}}'
-          scope: comment.other.discard.gleam
-          pop: 3
-        - include: or-fail
-    - include: or-fail
 
   # # Attributes (annotations)
   # attribute:
