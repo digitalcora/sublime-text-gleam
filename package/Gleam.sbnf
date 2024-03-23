@@ -1,0 +1,57 @@
+# EXTENSIONS = `gleam`
+
+# DISCARD = '_[_0-9a-z]*'
+# IDENT = '[a-z][_0-9a-z]*'
+# UPNAME = '[A-Z][0-9a-zA-Z]*'
+
+# prototype : ( ~comment )* ;
+
+# comment{comment.line} : '///?/?'{punctuation.definition.comment.line} ~'$';
+
+# main : (import)* ;
+
+# import : import-aliased | import-unaliased['entity.name.namespace'] ;
+
+# import-aliased :
+#   import-unaliased['entity.other.aliased.namespace']
+#   (
+#     `as`{keyword.other.alias}
+#     (IDENT{entity.name.namespace} | DISCARD{comment.discard})
+#   )
+# ;
+
+# import-unaliased[MODULE_SCOPE] :
+#   `import`{keyword.control.import}
+#   import-module-path[MODULE_SCOPE]
+#   (`.`{punctuation.accessor} import-unqualifieds)?
+# ;
+
+# import-module-path[SCOPE] :
+#   '((?:#[IDENT]/)*)(#[IDENT])'{1: entity.other.module-path, 2: #[SCOPE]}
+# ;
+
+# import-unqualifieds :
+#   `{`{punctuation.definition.generic.begin}
+#    series-of[import-unqualified]?
+#    `}`{punctuation.definition.generic.end}
+# ;
+
+# import-unqualified : imported-type | imported-variant | imported-const ;
+# imported-type : `type`{storage.type} aliased[UPNAME, 'type'] ;
+# imported-variant : aliased[UPNAME, 'function.constructor'] ;
+# imported-const : aliased[IDENT, 'constant'] ;
+
+# aliased[A, KIND] :
+#   A{entity.other.aliased.#[KIND]}
+#   `as`{keyword.other.alias}
+#   A{entity.name.#[KIND]}
+#   |
+#   A{entity.name.#[KIND]}
+# ;
+
+# series-of[A] : A (`,`{punctuation.separator} A)* `,`{punctuation.separator}?;
+
+IDENT = '[a-z]+'
+main : (`import`{keyword} maybe-aliased-item `;`{punctuation.terminator})*;
+maybe-aliased-item :
+  IDENT{entity.other} `as`{keyword} IDENT{entity.name} | IDENT{entity.name} ;

@@ -1,239 +1,71 @@
 %YAML 1.2
 ---
+# http://www.sublimetext.com/docs/syntax.html
 version: 2
-
-file_extensions:
-  - gleam
-
+name: Gleam
 scope: source.gleam
-
-variables:
-  lower_ident: '[[:lower:]][[:word:]]*'
-  upper_ident: '[[:upper:]][[:word:]]*'
-
 contexts:
+  # Include context for branch point main@1
+  include!main@1:
+    - match: '(?=[a-z]+)'
+      branch_point: main@1
+      branch:
+        - maybe-aliased-item|0|main@1
+        - maybe-aliased-item|1|main@1
+  # Rule: main
   main:
-    - include: attribute
-    - include: bitstring
-    - include: block
-    - include: comment
-    - include: constant_def
-    - include: function_def
-    - include: keyword
-    - include: function_call
-    - include: record
-    - include: import
-    - include: number
-    - include: operator
-    - include: punctuation
-    - include: string
-    - include: unused_name
-    - include: type_name
-
-  # Attributes (annotations)
-  attribute:
-    - match: ^\s*(@{{lower_ident}})\(
-      captures:
-        1: variable.other.constant.gleam
-      push:
-        - include: arguments
-        - meta_scope: meta.annotation.gleam
-    - match: ^\s*(@{{lower_ident}})
-      scope: meta.annotation.gleam
-      captures:
-        1: variable.other.constant.gleam
-
-  # Arguments (to a function call, record constructor, or attribute)
-  arguments:
-    - include: bitstring
-    - include: block
-    - include: comment
-    - include: function_def
-    - include: function_call
-    - include: record
-    - include: number
-    - include: operator
-    - include: punctuation
-    - include: string
-    - include: unused_name
-    - include: type_name
-    - match: '\b{{lower_ident}}:'
-      scope: constant.other.gleam
-    - match: \)
+    - match: 'import'
+      scope: keyword.gleam
+      push: main|0
+    - match: '(?=\S)'
       pop: true
-
-  # Bitstrings
-  bitstring:
-    - match: '<<'
-      scope: punctuation.definition.generic.begin.gleam
-      push:
-        - include: number
-        - include: string
-        - match: \b(bytes|int|float|bits|utf8|utf16|utf32|utf8_codepoint|utf16_codepoint|utf32_codepoint|signed|unsigned|big|little|native|unit|size)\b
-          scope: keyword.other.gleam
-        - match: '>>'
-          scope: punctuation.definition.generic.end.gleam
-          pop: true
-
-  # Blocks
-  block:
-    - match: '{'
-      scope: punctuation.section.block.begin.gleam
-    - match: '}'
-      scope: punctuation.section.block.end.gleam
-
-  # Comments
-  comment:
-    - match: ///?/?
-      scope: punctuation.definition.comment.line.gleam
-      push:
-        - meta_scope: comment.line.gleam
-        - match: $
-          pop: true
-
-  # Constant definitions
-  constant_def:
-    - match: \b(const)\s+({{lower_ident}})\b
-      captures:
-        1: keyword.other.gleam
-        2: entity.name.constant.gleam
-
-  # Function calls
-  function_call:
-    - match: \b(?:{{lower_ident}}\.)*({{lower_ident}})\(
-      captures:
-        1: variable.function.gleam
-      push: arguments
-
-  # Function definitions
-  function_def:
-    - match: \b(fn)(?:[[:space:]]+({{lower_ident}}))?[[:space:]]*\(
-      captures:
-        1: storage.type.function.gleam
-        2: entity.name.function.gleam
-      push: function_def_args
-
-  # Function arguments
-  function_def_args:
-    - include: function_def
-    - include: punctuation
-    - include: type_name
-    - include: unused_name
-    - match: ->
-      scope: keyword.operator.gleam
-    - match: \b(?:({{lower_ident}})[[:space:]]+)?({{lower_ident}}:)
-      captures:
-        1: constant.other.gleam
-        2: variable.parameter.gleam
-    - match: \(
-      push: function_def_args
-    - match: \)
-      pop: true
-
-  # Imports
-  import:
-    - match: ^import\b
-      scope: keyword.control.import.gleam
-      push:
-        - match: \bas\b
-          scope: keyword.control.import.gleam
-        - match: \b(?:{{lower_ident}}/)*{{lower_ident}}\b
-          scope: entity.name.namespace.gleam
-        - match: (\.)({)
-          captures:
-            1: punctuation.accessor.gleam
-            2: punctuation.definition.generic.begin.gleam
-          push:
-            - include: punctuation
-            - include: type_name
-            - match: \bas\b
-              scope: keyword.control.import.gleam
-            - match: \btype\b
-              scope: storage.type.gleam
-            - match: '}'
-              scope: punctuation.definition.generic.end.gleam
-              pop: true
-        - match: $
-          pop: true
-
-  # Keywords
-  keyword:
-    - match: \b(as|assert|case|const|if|let|panic|todo|use)\b
-      scope: keyword.other.gleam
-    - match: \b(opaque|pub)\b
-      scope: storage.modifier.gleam
-    - match: \btype\b
-      scope: storage.type.gleam
-    - match: \bfn\b
-      scope: storage.type.function.gleam
-    # Reserved for future use
-    - match: \b(auto|delegate|derive|echo|else|implement|macro|test)\b
+  # Rule: main
+  main|0:
+    - include: include!main@1
+    - match: '\S'
       scope: invalid.illegal.gleam
-
-  # Numbers
-  number:
-    - match: \b0b[01]+\b
-      scope: constant.numeric.binary.gleam
-    - match: \b0o[0-7]+\b
-      scope: constant.numeric.octal.gleam
-    - match: \b[[:digit:]][[:digit:]_]*(\.[[:digit:]]*(e-?[[:digit:]]+)?)?\b
-      scope: constant.numeric.decimal.gleam
-    - match: \b0x[[:xdigit:]]+\b
-      scope: constant.numeric.hexadecimal.gleam
-
-  # Operators
-  operator:
-    - match: <-
-      scope: keyword.operator.assignment.gleam
-    - match: (\|>|\.\.|<=\.|>=\.|==\.|!=\.|<\.|>\.|<=|>=|==|!=|<|>|<>)
-      scope: keyword.operator.gleam
-    - match: '='
-      scope: keyword.operator.assignment.gleam
-    - match: ->
-      scope: keyword.operator.gleam
-    - match: (\+\.|\-\.|/\.|\*\.|%\.|\+|\-|/|\*|%)
-      scope: keyword.operator.arithmetic.gleam
-    - match: (&&|\|\|)
-      scope: keyword.operator.logical.gleam
-    - match: \|
-      scope: keyword.operator.gleam
-
-  # Punctuation (separators, accessors)
-  punctuation:
-    - match: \.
-      scope: punctuation.accessor.gleam
-    - match: ','
-      scope: punctuation.separator.gleam
-
-  # Records (constructors with arguments)
-  record:
-    - match: \b((?:{{lower_ident}}\.)*{{upper_ident}})\(
-      captures:
-        1: entity.name.type.gleam
-      push: arguments
-
-  # Strings
-  string:
-    - match: '"'
-      scope: punctuation.definition.string.begin.gleam
-      push:
-        - meta_scope: string.quoted.double.gleam
-        - match: \\[fnrt"\\]
-          scope: constant.character.escape.gleam
-        - match: \\u\{[[:xdigit:]]{1,6}\}
-          scope: constant.character.escape.gleam
-        - match: \\
-          scope: invalid.illegal.gleam
-        - match: '"'
-          scope: punctuation.definition.string.end.gleam
-          pop: true
-
-  # Types and constructors
-  type_name:
-    - match: \b(?:{{lower_ident}}\.)*{{upper_ident}}\b
-      scope: entity.name.type.gleam
-
-  # Unused bindings
-  unused_name:
-    - match: \b_{{lower_ident}}\b
-      scope: comment.line.gleam
+      pop: true
+  # Rule: main
+  main|1|main@1:
+    - match: 'as'
+      scope: keyword.gleam
+      push: [main|3, maybe-aliased-item|2]
+      pop: true
+    - match: '\S'
+      fail: main@1
+  # Rule: main
+  main|2|main@1:
+    - match: ';'
+      scope: punctuation.terminator.gleam
+      pop: 2
+    - match: '\S'
+      scope: invalid.illegal.gleam
+      pop: true
+  # Rule: main
+  main|3:
+    - match: ';'
+      scope: punctuation.terminator.gleam
+      pop: true
+    - match: '\S'
+      scope: invalid.illegal.gleam
+      pop: true
+  maybe-aliased-item|0|main@1:
+    - meta_include_prototype: false
+    - match: '[a-z]+'
+      scope: entity.other.gleam
+      push: main|1|main@1
+      pop: true
+  maybe-aliased-item|1|main@1:
+    - meta_include_prototype: false
+    - match: '[a-z]+'
+      scope: entity.name.gleam
+      push: main|2|main@1
+      pop: true
+  # Rule: maybe-aliased-item
+  maybe-aliased-item|2:
+    - match: '[a-z]+'
+      scope: entity.name.gleam
+      pop: true
+    - match: '\S'
+      scope: invalid.illegal.gleam
+      pop: true

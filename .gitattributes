@@ -3,6 +3,7 @@
 .tool-versions export-ignore
 *.lock export-ignore
 *.md export-ignore
+*.sbnf export-ignore
 *.toml export-ignore
 bin export-ignore
 bin/** export-ignore
