@@ -2,7 +2,10 @@
 
   import aa/bb/cc.{
 //^^^^^^ keyword.control.import
-//       ^^^^^^ entity.other.module-path - entity.name.namespace - entity.other.aliased.namespace
+//       ^^ entity.other.module - entity.name.namespace - entity.other.aliased.namespace
+//         ^ punctuation.accessor
+//          ^^ entity.other.module
+//            ^ punctuation.accessor
 //             ^^ entity.other.aliased.namespace
 //               ^ punctuation.accessor
 //                ^ punctuation.definition.generic.begin
@@ -45,7 +48,7 @@
 //   ^^ entity.name.namespace
 
 import non/aliased.{cons, func}
-//     ^^^^ entity.other.module-path - entity.name.namespace - entity.other.aliased.namespace
+//     ^^^ entity.other.module - entity.name.namespace - entity.other.aliased.namespace
 //         ^^^^^^^ entity.name.namespace
 //                  ^^^^ entity.name.constant
 
@@ -58,8 +61,8 @@ import qq as
 //     ^^ entity.other.aliased.namespace
 //        ^^ keyword.other.alias
 import rr/ss/
-//     ^^^ entity.other.module-path
-//        ^^ entity.name.namespace
+//     ^^ entity.other.module
+//        ^^ entity.other.module
 
 
 // === Unqualified item fragments

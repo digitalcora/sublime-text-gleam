@@ -11,25 +11,56 @@ variables:
   discard: '_[_0-9a-z]*'
   name: '[a-z][_0-9a-z]*'
   upname: '[A-Z][0-9a-zA-Z]*'
-  not_module_keyword: '(?!const|external|fn|import|opaque|pub)'
+  keyword: 'as|assert|case|const|fn|import|let|opaque|panic|pub|todo|type|use'
+  reserved_keyword: 'auto|delegate|derive|echo|else|implement|macro|test'
 
 contexts:
   # Prepended to all scopes by default.
   prototype:
-    - include: whitespace
     - include: comment
 
-  # Consumes any sequence of whitespace characters, including newlines.
-  whitespace:
+  # The initial scope.
+  main:
+    - include: import
+
+  # Consumes any sequence of whitespace characters, excluding newlines.
+  #
+  # The compiler generally allows whitespace _including_ newlines between all
+  # tokens, but there are many cases where a newline would be unexpected in
+  # well-formatted code, and allowing them in this syntax would cause flickering
+  # during typing.
+  ws:
+    - match: \s+
+
+  # As `ws` but includes newlines.
+  ws-lf:
     - match: \s
       push:
         - match: (?=\S)
           pop: true
 
+  # Included in contexts that match a `name` which should not be a keyword.
+  no-keyword:
+    - match: '{{keyword}}|{{reserved_keyword}}'
+      scope: invalid.illegal.gleam
+      pop: true
+
+  # The final match in contexts that represent an optional syntax construct.
+  # Sequences of optional elements are handled by stacking their contexts; a
+  # context that doesn't match will pop itself, giving the next one a chance to
+  # match.
   opt:
     - match: ''
       pop: true
 
+  # The final match in contexts that represent a required syntax construct.
+  # Sequences of required elements are handled by each context `set`ing the
+  # next one when it matches; a context that doesn't match will pop itself,
+  # effectively aborting parsing of whatever higher-level element it is part
+  # of, in an attempt to continue scoping the rest of the file acceptably.
+  #
+  # Functionally this is identical to `opt`, but separating it means it can be
+  # swapped out for an alternate version that "fails loudly" for debugging.
   req:
     - match: ''
       pop: true
@@ -38,15 +69,6 @@ contexts:
     #   push:
     #     - match: .*
     #       meta_include_prototype: false
-
-  # The initial scope.
-  main:
-    - match: import\b
-      scope: keyword.control.import.gleam
-      branch_point: import
-      branch:
-        - import--name
-        - import--aliased-name
 
   # ==== Comments
   #
@@ -67,21 +89,37 @@ contexts:
 
   # ==== Import statements
 
+  import:
+    - match: import\b
+      scope: keyword.control.import.gleam
+      branch_point: import
+      branch:
+        - import--name
+        - import--aliased-name
+
   import--name:
-    - match: '{{not_module_keyword}}((?:{{name}}/)*)({{name}})'
+    - include: ws
+    - include: no-keyword
+    - match: '({{name}})(/)'
       captures:
-        1: entity.other.module-path.gleam
-        2: entity.name.namespace.gleam
+        1: entity.other.module.gleam
+        2: punctuation.accessor.gleam
+    - match: '{{name}}'
+      scope: entity.name.namespace.gleam
       set:
         - import--no-alias
         - import--unqualified
     - include: req
 
   import--aliased-name:
-    - match: '{{not_module_keyword}}((?:{{name}}/)*)({{name}})'
+    - include: ws
+    - include: no-keyword
+    - match: '({{name}})(/)'
       captures:
-        1: entity.other.module-path.gleam
-        2: entity.other.aliased.namespace.gleam
+        1: entity.other.module.gleam
+        2: punctuation.accessor.gleam
+    - match: '{{name}}'
+      scope: entity.other.aliased.namespace.gleam
       set:
         - import--alias
         - import--unqualified
@@ -96,16 +134,19 @@ contexts:
     - include: opt
 
   import--no-alias:
+    - include: ws-lf
     - match: as
       fail: import
     - match: ''
       pop: true
 
   import--alias:
+    - include: ws-lf
     - match: as
       scope: keyword.other.alias.gleam
       set:
-        - match: '{{not_module_keyword}}{{name}}'
+        - include: ws
+        - match: '{{name}}'
           scope: entity.name.namespace.gleam
           pop: true
         - match: '{{discard}}'
@@ -115,11 +156,13 @@ contexts:
     - include: req
 
   import--unqualified--pre:
+    - include: ws-lf
     - include: block-end
     - match: ''
       set: import--unqualified--item
 
   import--unqualified--item:
+    - include: ws-lf
     - match: 'type'
       scope: storage.type.gleam
       set: import--unqualified--item--type
@@ -130,6 +173,7 @@ contexts:
     - include: import--unqualified--req
 
   import--unqualified--item--type:
+    - include: ws
     - match: '({{upname}})\s+(as)'
       captures:
         1: entity.other.aliased.type.gleam
@@ -141,12 +185,14 @@ contexts:
     - include: import--unqualified--req
 
   import--unqualified--item--type--alias:
+    - include: ws
     - match: '{{upname}}'
       scope: entity.name.type.gleam
       set: import--unqualified--post
     - include: import--unqualified--req
 
   import--unqualified--item--variant:
+    - include: ws
     - match: '({{upname}})\s+(as)'
       captures:
         1: entity.other.aliased.function.constructor.gleam
@@ -158,12 +204,14 @@ contexts:
     - include: import--unqualified--req
 
   import--unqualified--item--variant--alias:
+    - include: ws
     - match: '{{upname}}'
       scope: entity.name.function.constructor.gleam
       set: import--unqualified--post
     - include: import--unqualified--req
 
   import--unqualified--item--constant:
+    - include: ws
     - match: '({{name}})\s+(as)'
       captures:
         1: entity.other.aliased.constant.gleam
@@ -175,12 +223,14 @@ contexts:
     - include: import--unqualified--req
 
   import--unqualified--item--constant--alias:
+    - include: ws
     - match: '{{name}}'
       scope: entity.name.constant.gleam
       set: import--unqualified--post
     - include: import--unqualified--req
 
   import--unqualified--post:
+    - include: ws-lf
     - include: block-end
     - match: ','
       scope: punctuation.separator.gleam
