@@ -129,6 +129,7 @@ contexts:
       push: function_def_args
     - match: \)
       pop: true
+      push: main
 
   # Imports
   import:
