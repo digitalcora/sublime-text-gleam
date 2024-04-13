@@ -21,7 +21,13 @@ contexts:
 
   # The initial scope.
   main:
+    - include: ws-lf
     - include: import
+    - include: pub
+    - include: const
+    - include: req-main
+
+  # ==== Utilities
 
   # Consumes any sequence of whitespace characters, excluding newlines.
   #
@@ -45,33 +51,49 @@ contexts:
       scope: invalid.illegal.gleam
       pop: true
 
-  # The final match in contexts that represent an optional syntax construct.
-  # Sequences of optional elements are handled by stacking their contexts; a
-  # context that doesn't match will pop itself, giving the next one a chance to
-  # match.
+  # Unconditionally pops when reached. Included as the final match in contexts
+  # that represent an optional syntax construct, allowing sequences of optional
+  # elements to be parsed by stacking their contexts in order.
   opt:
     - match: ''
       pop: true
 
-  # The final match in contexts that represent a required syntax construct.
-  # Sequences of required elements are handled by each context `set`ing the
-  # next one when it matches; a context that doesn't match will pop itself,
-  # effectively aborting parsing of whatever higher-level element it is part
-  # of, in an attempt to continue scoping the rest of the file acceptably.
-  #
-  # Functionally this is identical to `opt`, but separating it means it can be
-  # swapped out for an alternate version that "fails loudly" for debugging.
+  # Included as the final match in contexts that represent a required syntax
+  # construct. Normally identical to `opt`, since we should keep parsing the
+  # file as best we can even if a required element is missing (very often the
+  # case while editing code!) — but keeping it separate means it can be easily
+  # swapped out for a "stricter" version when needed, e.g. for debugging.
   req:
     - match: ''
       pop: true
-    # - match: .
-    #   scope: invalid.illegal.gleam
-    #   push:
-    #     - match: .*
-    #       meta_include_prototype: false
+
+  # Like `req` for contexts that represent an "item" in a list-like construct,
+  # where the list is ended by a closing brace. Instead of popping immediately,
+  # which would ultimately abandon parsing of the entire list, we first try to
+  # skip ahead to the end of the current item so we have a chance to continue
+  # parsing later items.
+  req-item-brace:
+    - match: ''
+      set:
+        - match: (?=[,}])
+          pop: true
+
+  # Like `req-item-brace` but the list ends with a bracket.
+  req-item-bracket:
+    - match: ''
+      set:
+        - match: (?=[,\]])
+          pop: true
+
+  # Like `req-item-brace` but the list ends with a paren.
+  req-item-paren:
+    - match: ''
+      set:
+        - match: (?=[,)])
+          pop: true
 
   # ==== Comments
-  #
+
   # According to the naming guide, "multi-line comments used as documentation"
   # should use `comment.block.documentation`. Unknown whether this has any real
   # effect in editors, or whether the scope should be applied to the entire doc
@@ -133,6 +155,10 @@ contexts:
       set: import--unqualified--pre
     - include: opt
 
+  # Reparse as an aliased import if we encounter an `as`. This is needed since
+  # we try the "unaliased" branch first, per the documentation's advice that
+  # for best performance, branches should be tried in order of how likely they
+  # are to be taken.
   import--no-alias:
     - include: ws-lf
     - match: as
@@ -157,9 +183,11 @@ contexts:
 
   import--unqualified--pre:
     - include: ws-lf
-    - include: block-end
+    - include: end-brace
     - match: ''
-      set: import--unqualified--item
+      set:
+        - import--unqualified--post
+        - import--unqualified--item
 
   import--unqualified--item:
     - include: ws-lf
@@ -170,7 +198,12 @@ contexts:
       set: import--unqualified--item--variant
     - match: '(?=[a-z])'
       set: import--unqualified--item--constant
-    - include: import--unqualified--req
+    - include: req-item-brace
+
+  # Rather than branching and multiplying the number of states, we cheat a bit
+  # and include both an aliased name token and the following `as` token in the
+  # same pattern. These being on separate lines is syntactically valid but very
+  # unlikely.
 
   import--unqualified--item--type:
     - include: ws
@@ -181,15 +214,15 @@ contexts:
       set: import--unqualified--item--type--alias
     - match: '{{upname}}'
       scope: entity.name.type.gleam
-      set: import--unqualified--post
-    - include: import--unqualified--req
+      pop: true
+    - include: req-item-brace
 
   import--unqualified--item--type--alias:
     - include: ws
     - match: '{{upname}}'
       scope: entity.name.type.gleam
-      set: import--unqualified--post
-    - include: import--unqualified--req
+      pop: true
+    - include: req-item-brace
 
   import--unqualified--item--variant:
     - include: ws
@@ -200,15 +233,15 @@ contexts:
       set: import--unqualified--item--variant--alias
     - match: '{{upname}}'
       scope: entity.name.function.constructor.gleam
-      set: import--unqualified--post
-    - include: import--unqualified--req
+      pop: true
+    - include: req-item-brace
 
   import--unqualified--item--variant--alias:
     - include: ws
     - match: '{{upname}}'
       scope: entity.name.function.constructor.gleam
-      set: import--unqualified--post
-    - include: import--unqualified--req
+      pop: true
+    - include: req
 
   import--unqualified--item--constant:
     - include: ws
@@ -219,36 +252,203 @@ contexts:
       set: import--unqualified--item--constant--alias
     - match: '{{name}}'
       scope: entity.name.constant.gleam
-      set: import--unqualified--post
-    - include: import--unqualified--req
+      pop: true
+    - include: req-item-brace
 
   import--unqualified--item--constant--alias:
     - include: ws
     - match: '{{name}}'
       scope: entity.name.constant.gleam
-      set: import--unqualified--post
-    - include: import--unqualified--req
+      pop: true
+    - include: req-item-brace
 
   import--unqualified--post:
     - include: ws-lf
-    - include: block-end
+    - include: end-brace
     - match: ','
       scope: punctuation.separator.gleam
       set: import--unqualified--pre
-    - include: import--unqualified--req
+    - include: req
 
-  import--unqualified--req:
-    - match: ''
+  # ==== Visibility modifiers
+
+  pub:
+    - match: pub\b
+      scope: storage.modifier.public.gleam
+      push:
+        - include: const
+        - include: req
+
+  # ==== Constants
+
+  const:
+    - match: const\b
+      scope: keyword.declaration.constant.gleam
+      push: const--name
+
+  const--name:
+    - include: ws
+    - include: no-keyword
+    - match: '{{name}}'
+      scope: entity.name.constant.gleam
       set:
-      - match: (?=[,}])
-        set: import--unqualified--post
+        - const--assignment
+        - const--type
+    - include: req
 
-  # === Common
+  const--type:
+    - include: opt
 
-  block-end:
+  const--assignment:
+    - include: ws
+    - match: '='
+      scope: keyword.operator.assignment.gleam
+      # NOTE: We don't currently restrict constant values to only the
+      # expressions that are valid in constants; any expression unit is
+      # allowed, similar to `let`. The only negative effect is that some
+      # constant expressions which are not valid syntax will be scoped as
+      # though they are.
+      set:
+        - include: ws-lf
+        - include: expression-unit
+        - include: req
+    - include: req
+
+  # ==== Common
+
+  end-brace:
     - match: '}'
       scope: punctuation.definition.generic.end.gleam
       pop: true
+
+  end-bracket:
+    - match: ']'
+      scope: punctuation.definition.generic.end.gleam
+      pop: true
+
+  end-paren:
+    - match: '\)'
+      scope: punctuation.definition.generic.end.gleam
+      pop: true
+
+  expression-unit:
+    - include: string
+    - include: float
+    - include: integer
+    - include: tuple
+    - include: list
+
+  float:
+    - match: '-?[0-9_]+\.[0-9_]*(e-?[0-9_]+)?\b'
+      scope: constant.numeric.float.decimal.gleam
+      pop: true
+
+  integer:
+    - match: -?0[bB][0-1_]+\b
+      scope: constant.numeric.integer.binary.gleam
+      pop: true
+    - match: -?0[oO][0-7_]+\b
+      scope: constant.numeric.integer.octal.gleam
+      pop: true
+    - match: -?[0-9][0-9_]*\b
+      scope: constant.numeric.integer.decimal.gleam
+      pop: true
+    - match: -?0[xX][0-9a-fA-F_]+\b
+      scope: constant.numeric.integer.hexadecimal.gleam
+      pop: true
+
+  list:
+    - match: '\['
+      scope: punctuation.definition.generic.begin.gleam
+      push: list--pre
+
+  list--pre:
+    - include: ws-lf
+    - include: end-bracket
+    - include: --list--spread
+    - match: ''
+      set:
+        - list--post
+        - list--item
+
+  list--item:
+    - include: ws-lf
+    - include: expression-unit
+    - include: req-item-bracket
+
+  list--post:
+    - include: ws-lf
+    - include: end-bracket
+    - include: --list--spread
+    - match: ','
+      scope: punctuation.separator.gleam
+      set: list--pre
+    - include: req
+
+  --list--spread:
+    - match: '\.\.'
+      scope: keyword.operator.spread.gleam
+      set:
+        - list--end
+        - list--tail
+
+  # TODO: Allowing _any_ expression as the tail of a list seems too permissive
+  # (e.g. a tuple literal is clearly invalid), though that's how the tree-sitter
+  # grammar does it.
+  list--tail:
+    - include: expression-unit
+    - include: req
+
+  list--end:
+    - include: ws-lf
+    - include: end-bracket
+    - include: req
+
+  string:
+    - match: '"'
+      scope: punctuation.definition.string.begin.gleam
+      set:
+        - meta_include_prototype: false
+        - meta_scope: string.quoted.double.gleam
+        - match: \\
+          scope: constant.character.escape.gleam
+          push: string--escape
+        - match: '"'
+          scope: punctuation.definition.string.end.gleam
+          pop: true
+
+  string--escape:
+    - match: '[fnrt"\\]'
+      scope: constant.character.escape.gleam
+    - match: u\{[[:xdigit:]]{1,6}\}
+      scope: constant.character.escape.gleam
+    - include: req
+
+  tuple:
+    - match: '#\('
+      scope: punctuation.definition.generic.begin.gleam
+      push: tuple--pre
+
+  tuple--pre:
+    - include: ws-lf
+    - include: end-paren
+    - match: ''
+      set:
+        - tuple--post
+        - tuple--item
+
+  tuple--item:
+    - include: ws-lf
+    - include: expression-unit
+    - include: req-item-paren
+
+  tuple--post:
+    - include: ws-lf
+    - include: end-paren
+    - match: ','
+      scope: punctuation.separator.gleam
+      set: tuple--pre
+    - include: req
 
   # # Attributes (annotations)
   # attribute:
@@ -302,13 +502,6 @@ contexts:
   #   - match: '}'
   #     scope: punctuation.section.block.end.gleam
 
-  # # Constant definitions
-  # constant_def:
-  #   - match: \b(const)\s+({{lower_ident}})\b
-  #     captures:
-  #       1: keyword.other.gleam
-  #       2: entity.name.constant.gleam
-
   # # Function calls
   # function_call:
   #   - match: \b(?:{{lower_ident}}\.)*({{lower_ident}})\(
@@ -355,17 +548,6 @@ contexts:
   #   - match: \b(auto|delegate|derive|echo|else|implement|macro|test)\b
   #     scope: invalid.illegal.gleam
 
-  # Numbers
-  # number:
-  #   - match: \b0b[01]+\b
-  #     scope: constant.numeric.binary.gleam
-  #   - match: \b0b[0-7]+\b
-  #     scope: constant.numeric.octal.gleam
-  #   - match: \b[[:digit:]][[:digit:]_]*(\.[[:digit:]]*)?\b
-  #     scope: constant.numeric.decimal.gleam
-  #   - match: \b0x[[:xdigit:]]+\b
-  #     scope: constant.numeric.hexadecimal.gleam
-
   # # Operators
   # operator:
   #   - match: (\|>|\.\.|<=\.|>=\.|==\.|!=\.|<\.|>\.|<=|>=|==|!=|<|>|<>|\|)
@@ -390,22 +572,6 @@ contexts:
   #     captures:
   #       1: entity.name.type.gleam
   #     push: arguments
-
-  # # Strings
-  # string:
-  #   - match: '"'
-  #     scope: punctuation.definition.string.begin.gleam
-  #     push:
-  #       - meta_scope: string.quoted.double.gleam
-  #       - match: \\[nrt"\\]
-  #         scope: constant.character.escape.gleam
-  #       - match: \\u\{[[:xdigit:]]{1,6}\}
-  #         scope: constant.character.escape.gleam
-  #       - match: \\
-  #         scope: invalid.illegal.gleam
-  #       - match: '"'
-  #         scope: punctuation.definition.string.end.gleam
-  #         pop: true
 
   # # Types and constructors
   # type_name:
