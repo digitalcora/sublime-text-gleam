@@ -69,3 +69,31 @@ call_me(maybe: fn(here is: MyNumber) { Nil })
 //                                   ^ punctuation.section.block.begin
 //                                     ^^^ entity.name.type
 //                                         ^ punctuation.section.block.end
+
+nested(
+  one: 1,
+  two: fn(arg) {
+    let func = fn(i) {
+//  ^^^ keyword.other
+//             ^^ storage.type.function
+//                   ^ punctuation.section.block.begin
+      let assert 1 = { 2 - 1 }
+//    ^^^ keyword.other
+//        ^^^^^^ keyword.other
+//               ^ constant.numeric
+//                 ^ keyword.operator.assignment
+//                   ^ punctuation.section.block.begin
+//                           ^ punctuation.section.block.end
+      let assert 2 = { 1 + 1 }
+      let assert 3 = { 5 - 2 }
+//    ^^^ keyword.other
+//        ^^^^^^ keyword.other
+
+      arg + i
+    }
+//  ^ punctuation.section.block.end
+  },
+  three: "3"
+//^^^^^^ constant.other
+//       ^^^ string.quoted.double
+)

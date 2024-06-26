@@ -13,6 +13,8 @@ variables:
 
 contexts:
   main:
+    - include: base
+  base:
     - include: attribute
     - include: bitstring
     - include: block
@@ -79,8 +81,10 @@ contexts:
   block:
     - match: '{'
       scope: punctuation.section.block.begin.gleam
+      push: base
     - match: '}'
       scope: punctuation.section.block.end.gleam
+      pop: true
 
   # Comments
   comment:
