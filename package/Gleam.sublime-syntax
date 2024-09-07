@@ -180,7 +180,7 @@ contexts:
       scope: constant.numeric.binary.gleam
     - match: \b0o[0-7][0-7_]*\b
       scope: constant.numeric.octal.gleam
-    - match: \b[[:digit:]][[:digit:]_]*(\.[[:digit:]]*(e-?[[:digit:]]+)?)?\b
+    - match: \b[0-9][0-9_]*(\.[0-9_]*(e-?[0-9][0-9_]*)?)?\b
       scope: constant.numeric.decimal.gleam
     - match: \b0x[[:xdigit:]][[:xdigit:]_]*\b
       scope: constant.numeric.hexadecimal.gleam

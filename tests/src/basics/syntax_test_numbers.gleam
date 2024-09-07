@@ -26,8 +26,10 @@ pub fn main() {
   // Underscores
   io.debug(1_000_000)
   //       ^^^^^^^^^ constant.numeric.decimal
-  io.debug(10_000.01)
-  //       ^^^^^^^^^ constant.numeric.decimal
+  io.debug(1_000.01_01)
+  //       ^^^^^^^^^^^ constant.numeric.decimal
+  io.debug(2.0e2_0)
+  //       ^^^^^^^ constant.numeric.decimal
   io.debug(0b0010_1101)
   //       ^^^^^^^^^^^ constant.numeric.binary
   io.debug(0o17_34)
