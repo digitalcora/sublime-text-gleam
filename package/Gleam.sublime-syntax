@@ -176,13 +176,13 @@ contexts:
 
   # Numbers
   number:
-    - match: \b0b[01]+\b
+    - match: \b0b[01][01_]*\b
       scope: constant.numeric.binary.gleam
-    - match: \b0o[0-7]+\b
+    - match: \b0o[0-7][0-7_]*\b
       scope: constant.numeric.octal.gleam
     - match: \b[[:digit:]][[:digit:]_]*(\.[[:digit:]]*(e-?[[:digit:]]+)?)?\b
       scope: constant.numeric.decimal.gleam
-    - match: \b0x[[:xdigit:]]+\b
+    - match: \b0x[[:xdigit:]][[:xdigit:]_]*\b
       scope: constant.numeric.hexadecimal.gleam
 
   # Operators
