@@ -162,7 +162,7 @@ contexts:
 
   # Keywords
   keyword:
-    - match: \b(as|assert|case|const|if|let|panic|todo|use)\b
+    - match: \b(as|assert|case|const|echo|if|let|panic|todo|use)\b
       scope: keyword.other.gleam
     - match: \b(opaque|pub)\b
       scope: storage.modifier.gleam
@@ -171,7 +171,7 @@ contexts:
     - match: \bfn\b
       scope: storage.type.function.gleam
     # Reserved for future use
-    - match: \b(auto|delegate|derive|echo|else|implement|macro|test)\b
+    - match: \b(auto|delegate|derive|else|implement|macro|test)\b
       scope: invalid.illegal.gleam
 
   # Numbers
