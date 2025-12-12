@@ -7,10 +7,10 @@ name = "sublime-text-gleam"
 version = "0.0.1"
 description = ""
 authors = [{name = "Cora Grant"}]
-requires-python = ">=3.9.1,<4.0"
+requires-python = ">=3.13,<4.0"
 dependencies = [
   "st-package-reviewer (~=0.3.0)",
-  "yamlfix (~=1.17.0)",
+  "yamlfix (~=1.19.0)",
 ]
 
 [tool.poetry]
