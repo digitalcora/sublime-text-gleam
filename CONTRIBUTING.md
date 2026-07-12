@@ -2,10 +2,7 @@
 
 Contributions are welcome!
 
-For non-trivial changes, please open a GitHub issue first to discuss. Note that
-to keep this project easy to maintain, I'm unlikely to accept new features if
-the same functionality can already be achieved with existing Gleam and Sublime
-Text tools. For a good example, see **Formatting** in the [README](README.md).
+For non-trivial changes, please open a GitHub issue first to discuss.
 
 ### Conduct
 

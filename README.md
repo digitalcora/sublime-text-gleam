@@ -17,74 +17,37 @@ This package is available on
 2. Select **Package Control: Install Package**
 3. Select **Gleam**
 
+### Language Server
 
-## LSP Integration
-
-The [**LSP**](https://packagecontrol.io/packages/LSP) package enables improved
-autocomplete, go-to-definition, formatting, "hover docs", compiler errors and
-warnings in the editor, and more. To set it up, install the package and open
-its settings (**Preferences: LSP Settings** in the command palette), then add
-this config:
+The [Gleam Language Server](https://gleam.run/language-server/) enables improved
+autocomplete, go-to-definition, formatting, "hover docs", compiler feedback in
+the editor, and more. To set it up, install the [**LSP**][LSP-inst] package and
+open **Preferences: LSP Server Configurations** in the command palette, then add
+a `gleam` server config:
 
 ```json
 {
-  "clients": {
-    "gleam": {
-      "enabled": true,
-      "command": ["gleam", "lsp"],
-      "selector": "source.gleam"
-    }
-  },
-  "lsp_format_on_save": true
+  "gleam": {
+    "enabled": true,
+    "command": ["gleam", "lsp"],
+    "selector": "source.gleam"
+  }
 }
 ```
 
-* If you don't want format-on-save, leave out the global `lsp_format_on_save`
-  option (the default is `false`) and instead use **LSP: Format File** in the
-  command palette, or bind this to a [keyboard shortcut][LSP-shortcuts].
+When Gleam is installed using `asdf` or a similar version manager, the `command`
+should instead be e.g. `["asdf", "exec", "gleam", "lsp"]`.
 
-* If you have Gleam installed using `asdf` or a similar version manager, the
-  `command` should instead be e.g. `["~/.asdf/shims/gleam", "lsp"]`.
+**Note:** If using Sublime Text on Windows and Gleam in WSL (or a similar
+scenario), the LSP package won't work since it [does not support][LSP-paths]
+path translation. In this case, you can still at least get in-editor formatting
+using the [**Fmt**](https://packagecontrol.io/packages/Fmt) package; follow its
+its instructions to set up a rule with `source.gleam` as the selector and e.g.
+`["wsl", "gleam", "format", "--stdin"]` as the command.
 
-* If Sublime Text and Gleam are installed in different environments (e.g.
-  Sublime on Windows and Gleam on WSL), the LSP package unfortunately won't
-  work, since it [does not support][LSP-paths] path translation. Note in the
-  specific case of WSL2 you _can_ install Sublime inside the Linux environment
-  and [use it that way][WSL-gui], at the cost of some UI quirks.
-
-[LSP-shortcuts]: https://lsp.sublimetext.io/customization/#keyboard-shortcuts-key-bindings
+[LSP-inst]: https://packages.sublimetext.io/packages/LSP
 [LSP-paths]: https://github.com/sublimelsp/LSP/issues/535
-[WSL-gui]: https://learn.microsoft.com/en-us/windows/wsl/tutorials/gui-apps
 
-
-## `Fmt` Integration
-
-The **LSP** package (see above) includes code formatting in the editor, but if
-you don't want to or can't use the LSP, you can still get formatting using the
-[**Fmt**](https://packagecontrol.io/packages/Fmt) package. Follow the
-instructions to install it and open the package settings, then add this rule:
-
-```json
-{
-  "rules": [
-    {
-      "selector": "source.gleam",
-      "cmd": ["gleam", "format", "--stdin"],
-      "format_on_save": true,
-      "merge_type": "diff",
-    },
-  ],
-}
-```
-
-* If you don't want format-on-save, leave out the `format_on_save` option and
-  instead use **Fmt: Format Buffer** in the command palette. See the Fmt README
-  for instructions on binding this to a keyboard shortcut.
-
-* If you have Gleam installed using `asdf` or a similar version manager, the
-  `cmd` should be modified in the same way as the LSP instructions, above. This
-  approach also works with WSL (prepend `"wsl"`) or other cases where Gleam and
-  Sublime are installed in different environments.
 
 
 ## Compatibility
