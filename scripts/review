@@ -1,0 +1,1 @@
+uvx -c requirements.txt st_package_reviewer .
