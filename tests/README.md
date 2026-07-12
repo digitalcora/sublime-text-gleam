@@ -15,15 +15,14 @@ are actually valid code. The `bad` directory contains code that intentionally
 produces compiler errors; since it's outside the `src` directory, the compiler
 will not complain about it.
 
-Two notes about local testing:
+Some notes on local testing:
 
-* The project root in Sublime should be the `Gleam` directory within Sublime's
+* The project root in Sublime must be the `Gleam` directory within Sublime's
   ["Packages" directory](../CONTRIBUTING.md), even if this is a symlink to your
   copy of the repo elsewhere (Sublime will handle the symlink transparently).
   If not, trying to run syntax tests will give the error _"The current file can
   not be used for testing since it is not loaded by Sublime Text."_
 
-* Due to a [known issue](https://github.com/sublimehq/sublime_text/issues/6274)
-  with Sublime, trying to run syntax tests when there is Gleam build output in
-  `build/` may fail silently and print a `UnicodeDecodeError` to the console.
-  If so, use `gleam clean` to remove this directory.
+* The **LSP** package intentionally [ignores syntax test files][3].
+
+[3]: https://github.com/sublimelsp/LSP/pull/2531
