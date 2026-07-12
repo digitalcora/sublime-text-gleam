@@ -1,3 +1,0 @@
-#!/bin/sh
-
-poetry run st_package_reviewer .

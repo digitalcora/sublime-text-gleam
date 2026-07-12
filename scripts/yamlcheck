@@ -1,0 +1,1 @@
+uvx -c requirements.txt yamlfix --check . package/*.sublime-syntax

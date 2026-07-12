@@ -1,3 +1,0 @@
-# Needs to be present for CI to work, though `asdf-poetry` should handle it...
-[virtualenvs]
-prefer-active-python = true

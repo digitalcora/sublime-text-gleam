@@ -1,12 +1,11 @@
 .git* export-ignore
 .github/** export-ignore
 .tool-versions export-ignore
-*.lock export-ignore
 *.md export-ignore
 *.toml export-ignore
-bin export-ignore
-bin/** export-ignore
 images export-ignore
 images/** export-ignore
+scripts export-ignore
+scripts/** export-ignore
 tests export-ignore
 tests/** export-ignore

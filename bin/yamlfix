@@ -1,3 +1,0 @@
-#!/bin/sh
-
-poetry run yamlfix $@ . package/*.sublime-syntax
